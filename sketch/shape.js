@@ -156,6 +156,10 @@ class Shape {
 		return corners;
 	}
 
+	// isHidingAnyPoints(cornerToTest, closest, point1, point2) {
+		
+	// }
+
 	getTestTriangle() {
 		let corners = [];
 		corners.push(createVector(width/2, 0));
