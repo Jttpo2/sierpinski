@@ -120,14 +120,10 @@ class Shape {
 
 		for (let i=2; i<numberOfCorners; i++) {
 			let pos = this.getRandomPos();
-			while (!this.isWhithinTriangle2(
-				pos, 
-				corners[i-2],
-				corners[i-1],
-				corners[i])) {
+			while (this.isWhithinTriangle2(pos, corners[i-2], corners[i-1], corners[i])) {
 				pos = this.getRandomPos();
 			}
-			corners.push(this.getRandomPos());
+			corners.push(pos);
 		}
 
 		// corners = this.getTestTriangle();
