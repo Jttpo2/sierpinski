@@ -1,3 +1,4 @@
-# Empty P5.js Project
-A basic P5.js project setup for use as foundation. Features gulp, livereload and js-concatenation. <br>
+# Sierpinski
+Sierpinski Gasket experiment.
+<br>
 By John Petersson

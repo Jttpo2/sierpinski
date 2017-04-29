@@ -17,7 +17,8 @@ gulp.task('reload', function() {
 
 var sketchFolder = "sketch/";
 var sketchFiles = [
-'emptyp5project.js'
+'sierpinski.js',
+'shape.js'
 ];
 
 sketchFiles.forEach(function(fileName, index) {
