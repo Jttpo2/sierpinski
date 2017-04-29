@@ -14,7 +14,7 @@ function setup() {
 
 	shape = new Shape();
 
-	// frameRate(80);
+	frameRate(1);
 
 	// Framerate holder, <p> element
 	fr = createP('');

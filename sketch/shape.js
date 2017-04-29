@@ -2,7 +2,8 @@ class Shape {
 	constructor() {
 		this.startingPos = this.getRandomPos();
 		this.currentPos = this.startingPos;
-		this.numberOfCorners = round(random(3, 5));
+		// this.numberOfCorners = round(random(3, 5));
+		this.numberOfCorners = 4;
 		// this.corners = this.getCorners(this.numberOfCorners);
 		this.corners = this.getBetterCorners(this.numberOfCorners);
 
@@ -57,12 +58,12 @@ class Shape {
 	}
 
 	displayCorners() {
-		this.corners.forEach(function (corner) {
-			this.displayPoint(corner, this.cornerSize, this.cornerColor);
+		this.corners.forEach(function (corner, index) {
+			this.displayPoint(corner, this.cornerSize, this.cornerColor, index.toString());
 		}, this);
 	}
 
-	displayPoint(pointPos, size, col) {
+	displayPoint(pointPos, size, col, textString) {
 		if (col) {
 			fill(col);
 			stroke(col);
@@ -70,9 +71,15 @@ class Shape {
 			fill(this.pointColor); 
 			stroke(this.pointColor);
 		}
-		strokeWeight(size);
 
+		strokeWeight(size);
 		point(pointPos.x, pointPos.y);
+
+		if (textString) {
+			// fill(0);
+			stroke(0);
+			text(textString, pointPos.x, pointPos.y);
+		}
 	}
 
 	move() {
@@ -114,13 +121,13 @@ class Shape {
 	getBetterCorners(numberOfCorners) {
 		let corners = [];
 		// Get starting triangle
-		for (let i=0; i< 3; i++) {
+		for (let i=0; i<3; i++) {
 			corners.push(this.getRandomPos());
 		}
 
-		for (let i=2; i<numberOfCorners; i++) {
+		for (let i=3; i<numberOfCorners; i++) {
 			let pos = this.getRandomPos();
-			for (let j=2; j<i; j++) {
+			for (let j=3; j<i; j++) {
 				while (this.isWhithinTriangle2(pos, corners[i-2], corners[i-1], corners[i])) {
 					pos = this.getRandomPos();
 				}
