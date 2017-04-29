@@ -135,29 +135,12 @@ class Shape {
 			corners.push(pos);
 		}
 
-		// corners = this.getTestTriangle();
-
-		// let fourthCorner = this.getRandomPos();
-		// while (this.isWhithinTriangle2(
-		// 	fourthCorner, 
-		// 	corners[0],
-		// 	corners[1],
-		// 	corners[2]) 
-		// 	) {
-
-			// this.displayPoint(fourthCorner, 20, color(20, 20, 200));
-		// fourthCorner = this.getRandomPos();
-	// }
-
-		// this.displayPoint(fourthCorner, 20, color(200, 20, 200));
-
-		// corners.push(fourthCorner);
 		this.numberOfCorners = corners.length;
 		return corners;
 	}
 
 	// isHidingAnyPoints(cornerToTest, closest, point1, point2) {
-		
+
 	// }
 
 	getTestTriangle() {
