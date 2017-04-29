@@ -10,7 +10,8 @@ class Shape {
 		this.cornerSize = 10;
 		this.pointSize = 1;
 
-		this.cornerColor = 200;
+		// this.cornerColor = 200;
+		this.cornerColor = color(200, 20, 200);
 		this.pointColor = 140;
 
 		this.calculationsPerFrame = 1000;
@@ -100,6 +101,7 @@ class Shape {
 		this.pointsToDraw = [];
 	}
 
+	// from: http://jsfiddle.net/PerroAZUL/zdaY8/1/
 	isWhithinTriangle2(p, p0, p1, p2) {
 		let A = 1/2 * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y) + p1.x * p2.y);
 		let sign = A < 0 ? -1 : 1;
@@ -111,54 +113,43 @@ class Shape {
 
 	getBetterCorners(numberOfCorners) {
 		let corners = [];
+		// Get starting triangle
 		for (let i=0; i< 3; i++) {
+			corners.push(this.getRandomPos());
+		}
+
+		for (let i=2; i<numberOfCorners; i++) {
+			let pos = this.getRandomPos();
+			while (!this.isWhithinTriangle2(
+				pos, 
+				corners[i-2],
+				corners[i-1],
+				corners[i])) {
+				pos = this.getRandomPos();
+			}
 			corners.push(this.getRandomPos());
 		}
 
 		// corners = this.getTestTriangle();
 
-		let fourthCorner = this.getRandomPos();
-		let maxIterations = 100;
-		while (this.isWhithinTriangle2(
-			fourthCorner, 
-			corners[0],
-			corners[1],
-			corners[2]) 
-			) {
+		// let fourthCorner = this.getRandomPos();
+		// while (this.isWhithinTriangle2(
+		// 	fourthCorner, 
+		// 	corners[0],
+		// 	corners[1],
+		// 	corners[2]) 
+		// 	) {
 
-		// this.displayPoint(fourthCorner, 20, color(20, 20, 200));
-		fourthCorner = this.getRandomPos();
-			// console.log(fourthCorner);
-			maxIterations--;
-		}
+			// this.displayPoint(fourthCorner, 20, color(20, 20, 200));
+		// fourthCorner = this.getRandomPos();
+	// }
 
 		// this.displayPoint(fourthCorner, 20, color(200, 20, 200));
 
-		corners.push(fourthCorner);
-		
+		// corners.push(fourthCorner);
 		this.numberOfCorners = corners.length;
-
 		return corners;
 	}
-
-	// isWhithinTriangle(point, corner1, corner2, corner3) {
-	// 	// http://mathworld.wolfram.com/TriangleInterior.html
-
-	// 	let v = point;
-	// 	let v0 = corner1;
-	// 	let v1 = p5.Vector.sub(corner2, v0);
-	// 	let v2 = p5.Vector.sub(corner3, v0);
-
-	// 	// v = v0 + a*v1 + b*v2;
-
-	// 	let a, b;
-
-	// 	a = (p5.Vector.cross(v, v2).sub(p5.Vector.cross(v0, v2))).div(p5.Vector.cross(v1, v2));
-	// 	b = (p5.Vector.cross(v, v1).sub(p5.Vector.cross(v0, v1))).div(p5.Vector.cross(v1, v2));
-
-	// 	console.log('a: ' + a + ' b: ' + b);
-	// 	return a > 0 && b > 0 && a + b < 1;
-	// }
 
 	getTestTriangle() {
 		let corners = [];
