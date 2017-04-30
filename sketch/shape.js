@@ -3,7 +3,7 @@ class Shape {
 		this.startingPos = this.getRandomPos();
 		this.currentPos = this.startingPos;
 		// this.numberOfCorners = round(random(3, 5));
-		this.numberOfCorners = 4;
+		this.numberOfCorners = 5;
 		// this.corners = this.getCorners(this.numberOfCorners);
 		this.corners = this.getBetterCorners(this.numberOfCorners);
 
@@ -120,7 +120,7 @@ class Shape {
 	}
 
 	// from: http://jsfiddle.net/PerroAZUL/zdaY8/1/
-	isWhithinTriangle2(p, p0, p1, p2) {
+	isWithinTriangle2(p, p0, p1, p2) {
 		let A = 1/2 * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y) + p1.x * p2.y);
 		let sign = A < 0 ? -1 : 1;
 		let s = (p0.y * p2.x - p0.x * p2.y + (p2.y - p0.y) * p.x + (p0.x - p2.x) * p.y) * sign;
@@ -141,11 +141,19 @@ class Shape {
 			
 			let closestCorner = this.getClosestCorner(outsidePos, corners);
 			let widestAngleCorner = this.getWidestAngledCorner(outsidePos, closestCorner, corners);
+			let widestFromWidest = this.getWidestAngledCorner(outsidePos, widestAngleCorner, corners);
 
-			this.displayPoint(closestCorner, 10, color(100, 50, 30), '   closest');
-			this.displayPoint(widestAngleCorner, 10, color(200, 50, 30), '   widest');
+			this.displayPoint(closestCorner, 10, color(100, 50, 30), '   close ' + i);
+			this.displayPoint(widestAngleCorner, 10, color(200, 50, 30), '   wide ' + i);
+			this.displayPoint(widestFromWidest, 10, color(200, 50, 30), '                    other ' + i);
 
-
+			// Check whether a corner in the new position would shade the closest point in the shape
+			while (this.isWithinTriangle2(closestCorner, outsidePos, widestAngleCorner, widestFromWidest)) {
+				outsidePos = this.getPosOutsideShape(corners);
+				closestCorner = this.getClosestCorner(outsidePos, corners);
+				widestAngleCorner = this.getWidestAngledCorner(outsidePos, closestCorner, corners);
+				widestFromWidest = this.getWidestAngledCorner(outsidePos, widestAngleCorner, corners);
+			}
 			corners.push(outsidePos);
 		}
 
@@ -159,7 +167,7 @@ class Shape {
 			return;
 		}
 		for (let j=3; j<shapeCorners.length; j++) {
-			while (this.isWhithinTriangle2(pos, shapeCorners[j-2], shapeCorners[j-1], shapeCorners[j])) {
+			while (this.isWithinTriangle2(pos, shapeCorners[j-2], shapeCorners[j-1], shapeCorners[j])) {
 				pos = this.getRandomPos();
 			}
 		} 
