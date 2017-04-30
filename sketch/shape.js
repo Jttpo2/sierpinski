@@ -4,7 +4,7 @@ class Shape {
 		this.currentPos = this.startingPos;
 		// this.numberOfCorners = round(random(3, 7));
 		if (devMode) {
-			this.numberOfCorners = 5;
+			this.numberOfCorners = 4;
 		}
 		// this.corners = this.getCorners(this.numberOfCorners);
 		this.corners = this.getBetterCorners(this.numberOfCorners);
@@ -210,22 +210,44 @@ class Shape {
 		}
 
 		let outsidePos;
-		for (let i=3; i<numberOfCorners; i++) {
-			// if (devMode) {
-			// 	outsidePos = this.getTestShadingPoint();	
 
-			// } else {
-				outsidePos = this.getPosOutsideShape(corners);	
-			// }
 
-			// Check whether a corner in the new position would shade the closest point in the shape
-			while (this.isShadingAnyCorner(outsidePos, corners)) {
-				// Then get a new point and calc again
-				
-				outsidePos = this.getPosOutsideShape(corners);
-			}
-			corners.push(outsidePos);
+		outsidePos = this.getTestPointDownLeft();
+		while (this.isShadingAnyCorner(outsidePos, corners)) {
+			// Then get a new point and calc again
+
+			outsidePos = this.getPosOutsideShape(corners);
 		}
+		corners.push(outsidePos);
+
+
+		outsidePos = this.getTestShadingPointDownLeft();
+		while (this.isShadingAnyCorner(outsidePos, corners)) {
+			// Then get a new point and calc again
+
+			outsidePos = this.getPosOutsideShape(corners);
+		}
+		corners.push(outsidePos);
+
+
+
+
+		// for (let i=3; i<numberOfCorners; i++) {
+		// 	if (devMode) {
+		// 		outsidePos = this.getTestShadingPointDownLeft();	
+
+		// 	} else {
+		// 		outsidePos = this.getPosOutsideShape(corners);	
+		// 	}
+
+		// 	// Check whether a corner in the new position would shade the closest point in the shape
+		// 	while (this.isShadingAnyCorner(outsidePos, corners)) {
+		// 		// Then get a new point and calc again
+
+		// 		outsidePos = this.getPosOutsideShape(corners);
+		// 	}
+		// 	corners.push(outsidePos);
+		// }
 
 		this.numberOfCorners = corners.length;
 		return corners;
@@ -237,6 +259,8 @@ class Shape {
 		let widestFromWidest = this.getWidestAngledCorner(point, widestAngleCorner, polygon);
 
 		if (closestCorner === widestAngleCorner || closestCorner === widestFromWidest) {
+			// TODO: Create solution for the edge case where this is ok
+
 			return false;
 		} 
 
@@ -330,8 +354,16 @@ class Shape {
 		return createVector(width/2, height/2);
 	}
 
-	getTestShadingPoint() {
+	getTestShadingPointAbove() {
 		return createVector(width/2, height*1/4);
+	}
+
+	getTestPointDownLeft() {
+		return createVector(width*1/4, height*9/10);	
+	}
+
+	getTestShadingPointDownLeft() {
+		return createVector(width*1/8, height*7/10);	
 	}
 
 }
