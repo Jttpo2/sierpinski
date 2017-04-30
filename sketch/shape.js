@@ -6,9 +6,8 @@ class Shape {
 		if (devMode) {
 			this.numberOfCorners = 4;
 		}
-		// this.corners = this.getCorners(this.numberOfCorners);
+		// this.corners = this.getCornersTest();
 		this.corners = this.getBetterCorners(this.numberOfCorners);
-
 
 		this.cornerSize = 10;
 		this.pointSize = 1;
@@ -29,7 +28,6 @@ class Shape {
 			this.labelCorners();
 			this.colorI = 0;
 		}
-
 	}
 
 	update() {
@@ -50,20 +48,6 @@ class Shape {
 			random(height));
 	}
 
-	getCorners(numberOfCorners) {
-		let corners = [];
-		if (isShapeRandom) {
-			for (let i=0; i< numberOfCorners; i++) {
-				corners.push(this.getRandomPos());
-			}
-		} else {
-			corners.push(createVector(width/2, 0));
-			corners.push(createVector(0, height));
-			corners.push(createVector(width, height));
-		}
-		return corners;
-	}
-
 	displayCorners() {
 		this.corners.forEach(function (corner, index) {
 			this.displayPoint(corner, this.cornerSize, this.cornerColor, index.toString());
@@ -76,7 +60,7 @@ class Shape {
 			stroke(col);
 		} else {
 			fill(this.pointColor); 
-			stroke(this.pointColor);
+			stroke(this.pointColor); 
 		}
 
 		strokeWeight(size);
@@ -136,9 +120,6 @@ class Shape {
 	}
 
 	isWithinTriangle3(p, p1, p2, p3) {
-		
-		
-
 		const DELTA_MAX = 0.00001;
 
 		if (devMode) {
@@ -185,12 +166,10 @@ class Shape {
 
 		for (let j=2; j<polygon.length; j++) {
 			if (this.isWithinTriangle3(point, polygon[j-2], polygon[j-1], polygon[j])) {
-				return true;
-				
+				return true;	
 			}
 		} 
 		return false;
-
 	}
 
 	isWithinAABoundingBox(pos, polygon) {
@@ -203,6 +182,34 @@ class Shape {
 		});
 
 		return !(pos.x < xMin || pos.x > xMax || pos.y < yMin || pos.y > yMax);
+	}
+
+	getCornersTest() {
+		let corners = [];
+
+		corners = this.getTestTriangle();
+		
+		let outsidePos;
+		outsidePos = this.getTestPointDownLeft();
+		
+		while (this.isShadingAnyCorner(outsidePos, corners)) {
+			// Then get a new point and calc again
+
+			outsidePos = this.getPosOutsideShape(corners);
+		}
+		corners.push(outsidePos);
+
+		outsidePos = this.getTestShadingPointDownLeft();
+		while (this.isShadingAnyCorner(outsidePos, corners)) {
+			// Then get a new point and calc again
+			console.log('should be new point');
+			outsidePos = this.getPosOutsideShape(corners);
+		}
+
+		corners.push(outsidePos);
+
+		this.numberOfCorners = corners.length;
+		return corners;
 	}
 
 	getBetterCorners(numberOfCorners) {
@@ -219,44 +226,20 @@ class Shape {
 
 		let outsidePos;
 
-		// ***** test
+		for (let i=3; i<numberOfCorners; i++) {
+			// if (devMode) {
+			// 	outsidePos = this.getTestShadingPointDownLeft();	
+			// } else {
+				outsidePos = this.getPosOutsideShape(corners);	
+			// }
 
-		outsidePos = this.getTestPointDownLeft();
-		while (this.isShadingAnyCorner(outsidePos, corners)) {
-			// Then get a new point and calc again
-
-			outsidePos = this.getPosOutsideShape(corners);
+			// Check whether a corner in the new position would shade the closest point in the shape
+			while (this.isShadingAnyCorner(outsidePos, corners)) {
+				// Then get a new point and calc again
+				outsidePos = this.getPosOutsideShape(corners);
+			}
+			corners.push(outsidePos);
 		}
-		corners.push(outsidePos);
-
-
-		outsidePos = this.getTestShadingPointDownLeft();
-		while (this.isShadingAnyCorner(outsidePos, corners)) {
-			// Then get a new point and calc again
-			console.log('should be new point');
-			outsidePos = this.getPosOutsideShape(corners);
-		}
-		corners.push(outsidePos);
-
-		// ********
-
-
-		// for (let i=3; i<numberOfCorners; i++) {
-		// 	if (devMode) {
-		// 		outsidePos = this.getTestShadingPointDownLeft();	
-
-		// 	} else {
-		// 		outsidePos = this.getPosOutsideShape(corners);	
-		// 	}
-
-		// 	// Check whether a corner in the new position would shade the closest point in the shape
-		// 	while (this.isShadingAnyCorner(outsidePos, corners)) {
-		// 		// Then get a new point and calc again
-
-		// 		outsidePos = this.getPosOutsideShape(corners);
-		// 	}
-		// 	corners.push(outsidePos);
-		// }
 
 		this.numberOfCorners = corners.length;
 		return corners;
@@ -281,18 +264,17 @@ class Shape {
 		let isShading;
 		
 		if (closestCorner === widestAngleCorner || closestCorner === widestFromWidest) {
-			// TODO: Create solution for the edge case where this is ok
-
-			 console.log('Any Within triangle?');
+			if (devMode) {
+				console.log('Any Within triangle?');
+			}
 			// If we end up here we need to check all points within [point, widest, widestFromWidest]
 			isShading = this.isAnyWithinTriangle(polygon, point, widestAngleCorner, widestFromWidest);
-
-			// return false;
 		} else {
-			console.log('Within single triangle?');
+			if (devMode) {
+				console.log('Within single triangle?');
+			}
 			isShading = this.isWithinTriangle3(closestCorner, point, widestAngleCorner, widestFromWidest);
 		} 
-		
 
 		if(devMode && isShading) {
 			this.displayPoint(closestCorner, 10, color(100, 200, 30), '            shaded');
@@ -366,10 +348,6 @@ class Shape {
 		return widestAngleCorner;
 	}
 
-	// isHidingAnyPoints(cornerToTest, closest, point1, point2) {
-
-	// }
-
 	getTestTriangle() {
 		let corners = [];
 		corners.push(createVector(width/2, height/3));
@@ -393,5 +371,4 @@ class Shape {
 	getTestShadingPointDownLeft() {
 		return createVector(width*1/8, height*7/10);	
 	}
-
 }
