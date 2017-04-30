@@ -110,14 +110,14 @@ class Shape {
 	}
 
 	// from: http://jsfiddle.net/PerroAZUL/zdaY8/1/
-	isWithinTriangle2(p, p0, p1, p2) {
-		let A = 1/2 * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y) + p1.x * p2.y);
-		let sign = A < 0 ? -1 : 1;
-		let s = (p0.y * p2.x - p0.x * p2.y + (p2.y - p0.y) * p.x + (p0.x - p2.x) * p.y) * sign;
-		let t = (p0.x * p1.y - p0.y * p1.x + (p0.y - p1.y) * p.x + (p1.x - p0.x) * p.y) * sign;
+	// isWithinTriangle2(p, p0, p1, p2) {
+	// 	let A = 1/2 * (-p1.y * p2.x + p0.y * (-p1.x + p2.x) + p0.x * (p1.y - p2.y) + p1.x * p2.y);
+	// 	let sign = A < 0 ? -1 : 1;
+	// 	let s = (p0.y * p2.x - p0.x * p2.y + (p2.y - p0.y) * p.x + (p0.x - p2.x) * p.y) * sign;
+	// 	let t = (p0.x * p1.y - p0.y * p1.x + (p0.y - p1.y) * p.x + (p1.x - p0.x) * p.y) * sign;
 
-		return s > 0 && t > 0 && (s + t) < 2 * A * sign;
-	}
+	// 	return s > 0 && t > 0 && (s + t) < 2 * A * sign;
+	// }
 
 	isWithinTriangle3(p, p1, p2, p3) {
 		const DELTA_MAX = 0.00001;
