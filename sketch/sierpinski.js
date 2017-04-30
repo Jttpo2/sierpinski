@@ -1,8 +1,12 @@
+let devMode = true;
+
 let shape;
 let isShapeRandom = true;
 
 // Framerate html holder
 let fr; 
+
+let isRunning;
 
 function setup() {
 	let canvas = createCanvas(
@@ -14,11 +18,14 @@ function setup() {
 
 	shape = new Shape();
 
-	frameRate(1);
+	if (devMode) {
+		frameRate(1);
+	}
 
 	// Framerate holder, <p> element
 	fr = createP('');
 
+	isRunning = true;
 }
 
 function draw() {
@@ -26,8 +33,10 @@ function draw() {
 	// fill(100); 
 	// rect(width/2, height/2, 50, 50);
 
-	shape.update();
-	shape.display();
+	if (isRunning) {
+		shape.update();
+		shape.display();
+	}
 
 	showFramerate();
 }
@@ -35,4 +44,22 @@ function draw() {
 // Displays framerate on screen
 function showFramerate() {
 	fr.html(floor(frameRate()));
+}
+
+function pause() {
+	isRunning = false;
+}
+
+function play() {
+	isRunning = true;
+}
+
+function togglePausePlay() {
+	isRunning = !isRunning;
+}
+
+function keyPressed() {
+	if (key === ' ') {
+		togglePausePlay();
+	}
 }
