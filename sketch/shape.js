@@ -149,6 +149,7 @@ class Shape {
 
 			// Check whether a corner in the new position would shade the closest point in the shape
 			while (this.isWithinTriangle2(closestCorner, outsidePos, widestAngleCorner, widestFromWidest)) {
+				// Then get a new point and calc again
 				outsidePos = this.getPosOutsideShape(corners);
 				closestCorner = this.getClosestCorner(outsidePos, corners);
 				widestAngleCorner = this.getWidestAngledCorner(outsidePos, closestCorner, corners);
@@ -166,11 +167,15 @@ class Shape {
 		if (shapeCorners.length < 3) {
 			return;
 		}
-		for (let j=3; j<shapeCorners.length; j++) {
-			while (this.isWithinTriangle2(pos, shapeCorners[j-2], shapeCorners[j-1], shapeCorners[j])) {
-				pos = this.getRandomPos();
-			}
-		} 
+
+		for (let i=2; i<shapeCorners.length; i++) {
+			for (let j=2; j<i; j++) {
+				while (this.isWithinTriangle2(pos, shapeCorners[j-2], shapeCorners[j-1], shapeCorners[j])) {
+					pos = this.getRandomPos();
+				}
+			} 
+			
+		}
 		return pos;
 	}
 
