@@ -137,6 +137,8 @@ class Shape {
 
 	isWithinTriangle3(p, p1, p2, p3) {
 		
+		
+
 		const DELTA_MAX = 0.00001;
 
 		if (devMode) {
@@ -158,12 +160,18 @@ class Shape {
 		A2 = abs(A2);
 		A3 = abs(A3);
 		
-		if (devMode) {
-			let others = A1 + A2 + A3;
-			console.log('A: ' + A + " 1: " + A1 + " 2: " + A2 + " 3: " + A3 + " Others: " + others );
+		let isWithin = abs(A - (A1 + A2 + A3)) < DELTA_MAX ;
+
+		if (p === p1 || p === p2 || p === p3) {
+			isWithin = false;
 		}
 
-		return abs(A - (A1 + A2 + A3)) < DELTA_MAX ;
+		if (devMode) {
+			let others = A1 + A2 + A3;
+			console.log(isWithin + " " + 'A: ' + A + " 1: " + A1 + " 2: " + A2 + " 3: " + A3 + " Others: " + others);
+		}
+
+		return isWithin;
 	}
 
 	calcAreaOfTriangle(p1, p2, p3) {		
@@ -211,6 +219,7 @@ class Shape {
 
 		let outsidePos;
 
+		// ***** test
 
 		outsidePos = this.getTestPointDownLeft();
 		while (this.isShadingAnyCorner(outsidePos, corners)) {
@@ -224,12 +233,12 @@ class Shape {
 		outsidePos = this.getTestShadingPointDownLeft();
 		while (this.isShadingAnyCorner(outsidePos, corners)) {
 			// Then get a new point and calc again
-
+			console.log('should be new point');
 			outsidePos = this.getPosOutsideShape(corners);
 		}
 		corners.push(outsidePos);
 
-
+		// ********
 
 
 		// for (let i=3; i<numberOfCorners; i++) {
@@ -258,11 +267,6 @@ class Shape {
 		let widestAngleCorner = this.getWidestAngledCorner(point, closestCorner, polygon);
 		let widestFromWidest = this.getWidestAngledCorner(point, widestAngleCorner, polygon);
 
-		if (closestCorner === widestAngleCorner || closestCorner === widestFromWidest) {
-			// TODO: Create solution for the edge case where this is ok
-
-			return false;
-		} 
 
 		if (devMode) {
 			this.displayPoint(closestCorner, 10, color(100, 50, 30), '   close ');
@@ -273,14 +277,38 @@ class Shape {
 			// this.displayTriangle(point, widestAngleCorner, widestFromWidest, col);
 			this.colorI += 1;
 		}
+
+		let isShading;
 		
-		let isShading = this.isWithinTriangle3(closestCorner, point, widestAngleCorner, widestFromWidest);
+		if (closestCorner === widestAngleCorner || closestCorner === widestFromWidest) {
+			// TODO: Create solution for the edge case where this is ok
+
+			 console.log('Any Within triangle?');
+			// If we end up here we need to check all points within [point, widest, widestFromWidest]
+			isShading = this.isAnyWithinTriangle(polygon, point, widestAngleCorner, widestFromWidest);
+
+			// return false;
+		} else {
+			console.log('Within single triangle?');
+			isShading = this.isWithinTriangle3(closestCorner, point, widestAngleCorner, widestFromWidest);
+		} 
+		
 
 		if(devMode && isShading) {
 			this.displayPoint(closestCorner, 10, color(100, 200, 30), '            shaded');
 		}
 
 		return isShading;
+	}
+
+	isAnyWithinTriangle(points, p1, p2, p3) {
+		let isAnyWithin = false;
+		points.forEach(function(point) {
+			if (this.isWithinTriangle3(point, p1, p2, p3)) {
+				isAnyWithin = true;
+			}
+		}, this);
+		return isAnyWithin;
 	}
 
 	displayTriangle(p1, p2, p3, col) {
