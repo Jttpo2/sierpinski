@@ -22,7 +22,8 @@ class Shape {
 		this.movementVector = null; 
 		this.moveToCornerIndex = 0;
 
-		this.displayCorners();
+		// this.displayCorners();
+		this.labelCorners();
 	}
 
 	update() {
@@ -76,10 +77,20 @@ class Shape {
 		point(pointPos.x, pointPos.y);
 
 		if (textString) {
-			// fill(0);
-			stroke(0);
-			text(textString, pointPos.x, pointPos.y);
+			this.labelPoint(pointPos, textString);
 		}
+	}
+
+	labelCorners() {
+		this.corners.forEach(function (corner, index) {
+			this.labelPoint(corner, index.toString());
+		}, this);
+	}
+
+	labelPoint(pointPos, textString) {
+			fill(0);
+			strokeWeight(0);
+			text(textString, pointPos.x + 10, pointPos.y + 10);	
 	}
 
 	move() {
@@ -126,17 +137,65 @@ class Shape {
 		}
 
 		for (let i=3; i<numberOfCorners; i++) {
-			let pos = this.getRandomPos();
-			for (let j=3; j<i; j++) {
-				while (this.isWhithinTriangle2(pos, corners[i-2], corners[i-1], corners[i])) {
-					pos = this.getRandomPos();
-				}
-			} 
-			corners.push(pos);
+			let outsidePos = this.getPosOutsideShape(corners);
+			
+			let closestCorner = this.getClosestCorner(outsidePos, corners);
+			let widestAngleCorner = this.getWidestAngledCorner(outsidePos, closestCorner, corners);
+
+			this.displayPoint(closestCorner, 10, color(100, 50, 30), '   closest');
+			this.displayPoint(widestAngleCorner, 10, color(200, 50, 30), '   widest');
+
+
+			corners.push(outsidePos);
 		}
 
 		this.numberOfCorners = corners.length;
 		return corners;
+	}
+
+	getPosOutsideShape(shapeCorners) {
+		let pos = this.getRandomPos();
+		if (shapeCorners.length < 3) {
+			return;
+		}
+		for (let j=3; j<shapeCorners.length; j++) {
+			while (this.isWhithinTriangle2(pos, shapeCorners[j-2], shapeCorners[j-1], shapeCorners[j])) {
+				pos = this.getRandomPos();
+			}
+		} 
+		return pos;
+	}
+
+	getClosestCorner(pos, corners) {
+		let closest = corners[0];
+		let closestDistance = p5.Vector.dist(pos, closest);
+		corners.forEach(function(corner) {
+			let d = p5.Vector.dist(pos, corner);
+			if (d < closestDistance) {
+				closest = corner;
+				closestDistance = d;
+			} 
+		});
+		return closest;
+	}
+
+	getWidestAngledCorner(point, closestCornerPos, corners) {
+		let toClosestCorner = p5.Vector.sub(closestCornerPos, point);
+		
+		let widestAngleCorner = corners[0];
+		let toWidestAngleCorner = p5.Vector.sub(widestAngleCorner, point);
+		let widestAngle = 0;
+
+		corners.forEach(function(corner) {
+			let toCorner = p5.Vector.sub(corner, point);
+			let angle = p5.Vector.angleBetween(toCorner, toClosestCorner);
+			if (angle > widestAngle) {
+				widestAngleCorner = corner;
+				widestAngle = angle;
+			}
+		}, this);
+
+		return widestAngleCorner;
 	}
 
 	// isHidingAnyPoints(cornerToTest, closest, point1, point2) {
