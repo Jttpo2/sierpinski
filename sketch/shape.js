@@ -88,9 +88,9 @@ class Shape {
 	}
 
 	labelPoint(pointPos, textString) {
-			fill(0);
-			strokeWeight(0);
-			text(textString, pointPos.x + 10, pointPos.y + 10);	
+		fill(0);
+		strokeWeight(0);
+		text(textString, pointPos.x + 10, pointPos.y + 10);	
 	}
 
 	move() {
@@ -129,6 +129,18 @@ class Shape {
 		return s > 0 && t > 0 && (s + t) < 2 * A * sign;
 	}
 
+	isWithinAABoundingBox(pos, polygon) {
+		let xMin=width, xMax=0, yMin=height, yMax=0;
+		polygon.forEach(function(point) {
+			xMin = min(xMin, point.x);
+			xMax = max(xMax, point.x);
+			yMin = min(yMin, point.y);
+			yMax = min(yMax, point.y);
+		});
+
+		return !(pos.x < xMin || pos.x > xMax || pos.y < yMin || pos.y > yMax);
+	}
+
 	getBetterCorners(numberOfCorners) {
 		let corners = [];
 		// Get starting triangle
@@ -164,18 +176,14 @@ class Shape {
 
 	getPosOutsideShape(shapeCorners) {
 		let pos = this.getRandomPos();
-		if (shapeCorners.length < 3) {
-			return;
-		}
 
-		for (let i=2; i<shapeCorners.length; i++) {
-			for (let j=2; j<i; j++) {
-				while (this.isWithinTriangle2(pos, shapeCorners[j-2], shapeCorners[j-1], shapeCorners[j])) {
-					pos = this.getRandomPos();
-				}
-			} 
-			
-		}
+		for (let j=2; j<shapeCorners.length; j++) {
+			while (this.isWithinAABoundingBox(pos, shapeCorners) || this.isWithinTriangle2(pos, shapeCorners[j-2], shapeCorners[j-1], shapeCorners[j])) {
+				this.displayPoint(pos, 10, color(500, 50, 30), '   inside ');
+				pos = this.getRandomPos();
+			}
+		} 
+
 		return pos;
 	}
 
@@ -194,7 +202,7 @@ class Shape {
 
 	getWidestAngledCorner(point, closestCornerPos, corners) {
 		let toClosestCorner = p5.Vector.sub(closestCornerPos, point);
-		
+
 		let widestAngleCorner = corners[0];
 		let toWidestAngleCorner = p5.Vector.sub(widestAngleCorner, point);
 		let widestAngle = 0;
