@@ -3,6 +3,8 @@ let devMode = true;
 let shape;
 let isShapeRandom = true;
 
+let calculationsPerFrame = 1000;
+
 // Framerate html holder
 let fr; 
 
