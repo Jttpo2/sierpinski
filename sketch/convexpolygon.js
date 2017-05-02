@@ -2,7 +2,8 @@ class ConvexPolygon {
 	constructor(noOfPoints) {
 		this.startingPos = Helper.randomPos;
 
-		this.points = this.getPoints(noOfPoints);
+		// this.points = this.getPoints(noOfPoints);
+		this.points = this.makePolygon(noOfPoints);
 
 		this.pointSize = 10;
 		this.pointColor = color(100, 100, 100);
@@ -122,6 +123,14 @@ class ConvexPolygon {
 		return points;
 	}
 
+	getRandomTriangle() {
+		let triangle = [];
+		for (let i=0; i<3; i++) {
+			triangle.push(Helper.randomPosition);
+		}	
+		return triangle;
+	}
+
 	getPoints(numberOfPoints) {
 		let points = [];
 		
@@ -129,9 +138,7 @@ class ConvexPolygon {
 			points = this.getTestTriangle();
 		} else {
 			// Get starting triangle
-			for (let i=0; i<3; i++) {
-				points.push(Helper.randomPos);
-			}	
+			points = this.getRandomTriangle();
 		}
 
 		let outsidePos;
@@ -269,4 +276,52 @@ class ConvexPolygon {
 		return createVector(width*1/8, height*7/10);	
 	}
 
+	makePolygon(noOfPoints) {
+		let points = this.getRandomTriangle();
+		for(let i=3; i<noOfPoints;i++) {
+			points.push(this.calcNewPointPosition(points));
+		}
+		return points;
+	}
+
+	calcNewPointPosition(polygon) {
+		// Get base vector from two last points of polygon
+		let baseVector = p5.Vector.sub(
+			polygon[polygon.length-1], 
+			polygon[polygon.length-2]).normalize();
+		// Get max angle vector from last and first points of polygon
+		let maxAngleVector = p5.Vector.sub(
+			polygon[polygon.length-1], 
+			polygon[0]).normalize();
+		// Angle between the two?
+		let angleBetween = p5.Vector.angleBetween(baseVector, maxAngleVector);
+		// New point vector is the base vector rotated to somehere in that interval
+		let rotation = random(0, angleBetween);
+		let newPointVector = baseVector.copy();
+		newPointVector.rotate(rotation);
+		// Make to length extending outside sketch to check for intersection with limit direction
+		newPointVector.mult(max(width, height));
+
+		let newVectorRay = new Ray(polygon[polygon.length-1], newPointVector);
+		newVectorRay.display();
+
+		// Limit direction the ray extending from the first two points of the plygon
+		let limitDirection = p5.Vector.sub(
+			polygon[0], 
+			polygon[1]).normalize();
+		limitDirection.mult(max(width, length));
+		
+		let limitRay = new Ray(polygon[0], limitDirection);
+		 
+		// How long max?
+		let maxLength = newVectorRay.getDistanceToIntersectionWith(limitRay);
+		// Cut new point vector to random length
+		let randomLength = random(0, maxLength);
+		newPointVector.normalize();
+		newPointVector.mult(randomLength);
+
+		// New point is at
+		let newPoint = p5.Vector.add(polygon[polygon.length-1], newPointVector);
+		return newPoint;
+	}
 }
