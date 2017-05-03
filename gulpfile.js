@@ -17,6 +17,7 @@ gulp.task('reload', function() {
 
 var sketchFolder = "sketch/";
 var sketchFiles = [
+'ray.js',
 'helper.js',
 'convexplygon.js',
 'sierpinski.js',
