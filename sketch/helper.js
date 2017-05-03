@@ -57,4 +57,17 @@ class Helper {
 	static calcAreaOfTriangle(p1, p2, p3) {		
 		return (p1.x*(p2.y - p3.y) + p2.x*(p3.y-p1.y) + p3.x*(p1.y - p2.y)) * 1/2;
 	}
+
+	// From: http://stackoverflow.com/questions/14066933/direct-way-of-computing-clockwise-angle-between-2-vectors
+	// Clockwise angle between two vectors
+	static calcClockwiseAngleBetween(v1, v2) {
+		let dot = v1.x*v2.x + v1.y*v2.y;	// dot product between [x1, y1] and [x2, y2]
+		let det = v1.x*v2.y - v1.y*v2.x;    // determinant
+		let angle = atan2(det, dot);				// atan2(y, x) or atan2(sin, cos)
+		// return TWO_PI - angle;
+		if (angle < 0) {
+			angle += TWO_PI;
+		}
+		return angle;
+	}
 }

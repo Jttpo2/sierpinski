@@ -278,50 +278,139 @@ class ConvexPolygon {
 
 	makePolygon(noOfPoints) {
 		let points = this.getRandomTriangle();
+		// let points = this.getTestTriangle();
 		for(let i=3; i<noOfPoints;i++) {
 			points.push(this.calcNewPointPosition(points));
 		}
 		return points;
 	}
 
+	drawLine(start, end, col, showStart) {
+		strokeWeight(1);
+		if (col) {
+			stroke(col);
+		} else {
+			stroke(23, 45, 80);
+		}
+		line(start.x, start.y, end.x, end.y);
+
+		if (showStart) {
+			strokeWeight(20);
+			if (col) {
+				fill(col);
+			} else {
+				fill(23, 45, 80);
+			}
+			point(start.x, start.y);
+		}
+	}
+
+	drawVector(vector, pos, col, showStart) {
+		vector = vector.copy();
+		this.drawLine(pos, p5.Vector.add(pos, vector.mult(1)), col, showStart );
+		// strokeWeight(20);
+		// point(pos.x, pos.y);
+	}
+
+	getStart(polygon) {
+		return polygon[0];
+	}
+
+	getLast(polygon) {
+		return polygon[polygon.length-1];
+	}
+
+	getSecondLast(polygon) {
+		return polygon[polygon.length-2];
+	}
+
 	calcNewPointPosition(polygon) {
 		// Get base vector from two last points of polygon
+		let start = this.getStart(polygon);
+		let last = this.getLast(polygon);
+		let secondLast = this.getSecondLast(polygon);
+
 		let baseVector = p5.Vector.sub(
-			polygon[polygon.length-1], 
-			polygon[polygon.length-2]).normalize();
+			last, 
+			secondLast);
+
+		if (devMode) {
+			// Draw first limit
+			this.drawLine(secondLast, last, color(50, 190, 100));
+
+			// Draw second limit
+			this.drawLine(this.getStart(polygon), this.getLast(polygon), color(83, 100, 200));
+	
+			// this.drawVector(baseVector, last, color(200, 100, 200));
+			// let direction = new Ray(last, baseVector);
+			// direction.display();
+			// this.drawLine(last, p5.Vector.add(last, baseVector.copy().mult(10)), color(200, 100, 200));
+		}
+
 		// Get max angle vector from last and first points of polygon
 		let maxAngleVector = p5.Vector.sub(
-			polygon[polygon.length-1], 
-			polygon[0]).normalize();
+			last, 
+			start).normalize();
+
 		// Angle between the two?
-		let angleBetween = p5.Vector.angleBetween(baseVector, maxAngleVector);
+		let clockwiseAngleBetween = Helper.calcClockwiseAngleBetween(baseVector, maxAngleVector);
+		console.log(degrees(clockwiseAngleBetween));
+		
+		clockwiseAngleBetween += PI;
+
+		console.log('after: ' + degrees(clockwiseAngleBetween));
 		// New point vector is the base vector rotated to somehere in that interval
-		let rotation = random(0, angleBetween);
 		let newPointVector = baseVector.copy();
-		newPointVector.rotate(rotation);
-		// Make to length extending outside sketch to check for intersection with limit direction
-		newPointVector.mult(max(width, height));
+		newPointVector.normalize();
+		let rotation;
+		rotation = random(clockwiseAngleBetween, TWO_PI);
 
-		let newVectorRay = new Ray(polygon[polygon.length-1], newPointVector);
+		// if (clockwiseAngleBetween > PI) {
+		// 	rotation = random(PI, clockwiseAngleBetween);
+		// } else if (clockwiseAngleBetween >= 0) {
+		// 	rotation = random(0, clockwiseAngleBetween);
+		// }  else if (clockwiseAngleBetween < -PI) {
+		// 	rotation = random(-PI, clockwiseAngleBetween);
+		// } else if (clockwiseAngleBetween < 0) {
+		// 	rotation = random(0, clockwiseAngleBetween);
+		// } else {
+		// 	console.log('angle outside');
+		// }
+
+		console.log('random rotation: ' + degrees(rotation));
+		newPointVector.rotate(rotation); 
+
+		// this.drawVector(newPointVector, last, color(12, 200, 15));
+
+		let newVectorRay = new Ray(last, newPointVector);
 		newVectorRay.display();
+		// newPointVector.mult(-1); // Flip
 
-		// Limit direction the ray extending from the first two points of the plygon
+
+		// Limit direction: the ray extending from the first two points of the plygon
 		let limitDirection = p5.Vector.sub(
-			polygon[0], 
+			start, 
 			polygon[1]).normalize();
 		limitDirection.mult(max(width, length));
-		
-		let limitRay = new Ray(polygon[0], limitDirection);
-		 
+		let limitRay = new Ray(start, limitDirection);
+		limitRay.display();
 		// How long max?
 		let maxLength = newVectorRay.getDistanceToIntersectionWith(limitRay);
+		console.log('maxLength: ' + maxLength);
+		if (maxLength < 0) {
+			// Rays do not intersect = put max length at edge of canvas
+			// TODO: max length at edge of canvas
+			maxLength = min(width, height);
+		}
 		// Cut new point vector to random length
 		let randomLength = random(0, maxLength);
-		newPointVector.normalize();
 		newPointVector.mult(randomLength);
 
+		// this.drawVector(newPointVector, last, color(200, 15, 23), true);
+
 		// New point is at
-		let newPoint = p5.Vector.add(polygon[polygon.length-1], newPointVector);
+		let newPoint = p5.Vector.add(last, newPointVector);
+
 		return newPoint;
 	}
 }

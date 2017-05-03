@@ -1,7 +1,8 @@
 class Ray {
-	constructor(startPos, direction) {
-		this.startPos = startPos;
-		this.direction = direction.copy().normalize();
+	constructor(start, dir) {
+		this.startPos = start.copy();
+		this.direction = dir.copy();
+		this.direction.normalize();
 
 		this.color = color(100, 20, 223);
 	}
@@ -35,7 +36,8 @@ class Ray {
 		let u = (dy * bd.x - dx * bd.y) / det;
 		let v = (dy * ad.x - dx * ad.y) / det;
 
-		return u;
+		// Return -1 if rays do not intersect
+		return max(-1, u);
 	}
 
 	getIntersectionPoint(thatRay) {
@@ -50,11 +52,12 @@ class Ray {
 		let u = (dy * bd.x - dx * bd.y) / det;
 		let v = (dy * ad.x - dx * ad.y) / det;
 
-		return p5.add(as, p5.mult(ad, u)); 
+		return p5.Vector.add(as, p5.Vector.mult(ad, u)); 
 	}
 
 	display() {
-		let endPos = p5.Vector.add(this.startPos, this.offset);
+		let length = max(width, height);
+		let endPos = p5.Vector.add(this.startPos, this.direction.copy().mult(length));
 		strokeWeight(1);
 		stroke(this.color);
 		line(this.startPos.x, this.startPos.y, endPos.x, endPos.y);
