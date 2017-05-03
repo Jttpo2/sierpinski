@@ -2,17 +2,15 @@ class ConvexPolygon {
 	constructor(noOfPoints) {
 		this.startingPos = Helper.randomPos;
 
-		// this.points = this.getPoints(noOfPoints);
-		this.points = this.makePolygon(noOfPoints);
+		this.points = null;
+		this.makeRandomPolygon(noOfPoints);
 
 		this.pointSize = 10;
 		this.pointColor = color(100, 100, 100);
 
 		this.showPoints = false;
 
-		if (devMode) {
-			this.labelPoints();
-		}
+		if (devMode) {this.labelPoints();}
 	}
 
 	get allPoints() {
@@ -83,15 +81,12 @@ class ConvexPolygon {
 		return points;
 	}
 
-	makePolygon(noOfPoints) {
-		let points = this.getRandomTriangle();
-		if (devMode) {
-			// let points = this.getTestTriangle();
-		}
+	makeRandomPolygon(noOfPoints) {
+		this.points = this.getRandomTriangle();
+		// if (devMode) {this.points = this.getTestTriangle();}
 		for(let i=3; i<noOfPoints;i++) {
-			points.push(this.calcNewPointPosition(points));
+			this.points.push(this.calcNewPointPosition());
 		}
-		return points;
 	}
 
 	drawLine(start, end, col, showStart) {
@@ -119,36 +114,34 @@ class ConvexPolygon {
 		this.drawLine(pos, p5.Vector.add(pos, vector.mult(1)), col, showStart );
 	}
 
-	getFirst(polygon) {
-		return polygon[0];
+	get first() {
+		return this.points[0];
 	}
 
-	getSecond(polygon) {
-		return polygon[1];
+	get second() {
+		return this.points[1];
 	}
 
-	getLast(polygon) {
-		return polygon[polygon.length-1];
+	get last() {
+		return this.points[this.points.length-1];
 	}
 
-	getSecondLast(polygon) {
-		return polygon[polygon.length-2];
+	get secondLast() {
+		return this.points[this.points.length-2];
 	}
 
-	calcNewPointPosition(polygon) {
-		let first = this.getFirst(polygon);
-		let second = this.getSecond(polygon);
-		let last = this.getLast(polygon);
-		let secondLast = this.getSecondLast(polygon);
+	calcNewPointPosition() {
+		let first = this.first;
+		let second = this.second;
+		let last = this.last;
+		let secondLast = this.secondLast;
 
 		// Get base vector from two last points of polygon
 		let baseVector = p5.Vector.sub(
 			last, 
 			secondLast);
 
-		if (devMode) {
-			this.drawHelplines(first, secondLast, last, baseVector);
-		}
+		if (devMode) {this.drawHelplines(baseVector);}
 
 		// Get max angle vector from last and first points of polygon
 		let maxAngleVector = p5.Vector.sub(
@@ -166,26 +159,16 @@ class ConvexPolygon {
 		let rotation = random(clockwiseAngleBetween, TWO_PI);
 		newPointVector.rotate(rotation); 
 
-		if (devMode) {
-			this.drawVector(
-				newPointVector, 
-				last, 
-				color(12, 200, 15));
-		}
+		if (devMode) {this.drawVector(newPointVector, last, color(12, 200, 15));}
 
 		// Max length of new point vector
-		let maxLength = this.getMaxLength(first, second, last, newPointVector);
+		let maxLength = this.getMaxLength(newPointVector);
 
 		// Cut new point vector to random length within set limits
 		let randomLength = random(0, maxLength);
 		newPointVector.mult(randomLength);
 
-		if (devMode) {
-			this.drawVector(
-				newPointVector, 
-				last, 
-				color(200, 15, 23));
-		}
+		if (devMode) {this.drawVector(newPointVector, last, color(200, 15, 23));}
 
 		// New point is at
 		let newPoint = p5.Vector.add(
@@ -195,45 +178,45 @@ class ConvexPolygon {
 		return newPoint;
 	}
 
-	drawHelplines(first, secondLast, last, baseVector) {
+	drawHelplines(baseVector) {
 		// Draw first limit
-		this.drawLine(secondLast, last, color(50, 190, 100));
+		this.drawLine(
+			this.secondLast, 
+			this.last, 
+			color(50, 190, 100));
 
 		// Draw second limit
 		this.drawLine(
-			first, 
-			last, color(83, 100, 200));
+			this.first, 
+			this.last, 
+			color(83, 100, 200));
 
 		this.drawVector(
 			baseVector, 
-			last, 
+			this.last, 
 			color(200, 100, 200));
-		let direction = new Ray(last, baseVector);
+		let direction = new Ray(this.last, baseVector);
 		direction.display();
 		this.drawLine(
-			last, 
+			this.last, 
 			p5.Vector.add(
-				last, 
+				this.last, 
 				baseVector.copy().mult(10)), 
 			color(200, 100, 200));
 	}
 
-	getMaxLength(first, second, last, newPointVector) {
+	getMaxLength(newPointVector) {
 		// For finding max length of new point vector through raycasting 
-		let newVectorRay = new Ray(last, newPointVector);
-		if (devMode) {
-			newVectorRay.display();
-		}
+		let newVectorRay = new Ray(this.last, newPointVector);
+		if (devMode) {newVectorRay.display();}
 
 		// Limit direction: the ray extending from the first two points of the plygon
 		let limitDirection = p5.Vector.sub(
-			first, 
-			second).normalize();
+			this.first, 
+			this.second).normalize();
 		limitDirection.mult(max(width, length));
-		let limitRay = new Ray(first, limitDirection);
-		if (devMode) {
-			limitRay.display();
-		}
+		let limitRay = new Ray(this.first, limitDirection);
+		if (devMode) {limitRay.display();}
 		// How long max?
 		let maxLength = newVectorRay.getDistanceToIntersectionWith(limitRay);
 		if (maxLength < 0) {

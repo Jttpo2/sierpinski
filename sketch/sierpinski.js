@@ -1,4 +1,4 @@
-let devMode = true;
+let devMode = false;
 
 let shape;
 let isShapeRandom = true;
@@ -20,9 +20,7 @@ function setup() {
 
 	shape = new Shape();
 
-	if (devMode) {
-		// frameRate(1);
-	}
+	// if (devMode) {frameRate(1);}
 
 	// Framerate holder, <p> element
 	fr = createP('');
@@ -31,16 +29,12 @@ function setup() {
 }
 
 function draw() {
-	// background(200);
-	// fill(100); 
-	// rect(width/2, height/2, 50, 50);
-
 	if (isRunning) {
 		shape.update();
 		shape.display();
 	}
 
-	showFramerate();
+	if (devMode){showFramerate();}
 }
 
 // Displays framerate on screen
