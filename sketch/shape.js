@@ -4,7 +4,7 @@ class Shape {
 		this.currentPos = Helper.randomPosition;
 		this.numberOfCorners = round(random(3, 7));
 		if (devMode) {
-			this.numberOfCorners = 4;
+			// this.numberOfCorners = 4;
 		}
 		this.polygon = new ConvexPolygon(this.numberOfCorners);
 

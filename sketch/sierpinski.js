@@ -21,7 +21,7 @@ function setup() {
 	shape = new Shape();
 
 	if (devMode) {
-		frameRate(1);
+		// frameRate(1);
 	}
 
 	// Framerate holder, <p> element
