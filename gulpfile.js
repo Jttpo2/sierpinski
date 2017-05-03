@@ -20,8 +20,8 @@ var sketchFiles = [
 'ray.js',
 'helper.js',
 'convexplygon.js',
-'sierpinski.js',
-'shape.js'
+'shape.js',
+'sierpinski.js'
 ];
 
 sketchFiles.forEach(function(fileName, index) {
